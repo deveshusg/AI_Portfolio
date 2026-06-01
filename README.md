@@ -95,6 +95,17 @@ The projects are intentionally ordered so that each project builds on concepts l
 
 ---
 
+## Quick Start
+
+If you would like to run any project in this repository locally, see:
+
+
+docs/setup_and_run_guide.md
+
+
+The guide contains complete setup instructions, environment configuration, model setup, and execution steps for every project.
+
+
 ## Project 01 — Terminal Chatbot
 
 ### Status
