@@ -24,9 +24,9 @@ Personal learning workspace for local GenAI development.
 ## Learning Roadmap
 
 - [x] Environment Setup
-- [ ] Terminal Chatbot
-- [ ] Chat Memory
-- [ ] Streamlit Chatbot
+- [x] Terminal Chatbot
+- [x] Chat Memory
+- [X] Streamlit Chatbot
 - [ ] PDF Chat
 - [ ] Embeddings
 - [ ] Vector Database
