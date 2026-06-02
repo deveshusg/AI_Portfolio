@@ -31,3 +31,13 @@ projects/03_streamlit_chatbot/data/conversations/
 
 # Exports
 projects/03_streamlit_chatbot/data/exports/
+
+# Streamlit Chat Data
+projects/03_streamlit_chatbot_deployed/data/
+
+# Temporary files
+projects/03_streamlit_chatbot_deployed/temp.py
+
+# Diagnostics
+git_diagnostic.txt
+tracked_projects.txt
