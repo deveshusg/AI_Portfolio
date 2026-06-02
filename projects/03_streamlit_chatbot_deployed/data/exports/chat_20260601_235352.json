@@ -1,0 +1,134 @@
+{
+    "chat_id": "chat_20260601_235352",
+    "title": "1",
+    "model": "google/gemma-3-1b",
+    "created_at": "2026-06-01T23:53:52.270300",
+    "updated_at": "2026-06-01T23:55:58.144352",
+    "system_prompt": "\nYou are a helpful AI assistant.\n\nGuidelines:\n\n- Be accurate.\n- Be concise when possible.\n- Explain concepts clearly.\n- If you do not know something, say so.\n- Do not invent facts.\n",
+    "summary": "Okay, here's the summary text:\n\n*   User interactions focused on jokes, riddles, and puzzles.\n*   The chatbot provided a series of questions and responses related to humor, wordplay, and abstract concepts.\n*   No specific facts or preferences were recorded.\n*   No constraints or unresolved questions were identified.",
+    "last_summary_count": 22,
+    "last_finish_reason": "stop",
+    "messages": [
+        {
+            "role": "user",
+            "content": "1",
+            "timestamp": "2026-06-01T23:53:58.344270"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, let's do it! What would you like me to do? \n\nDo you want me to:\n\n*   **Answer a question?** (Please tell me the question!)\n*   **Generate something creative?** (Like a story, poem, or code snippet)\n*   **Just chat?** (Let's talk about whatever's on your mind.)",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:54:02.574047"
+        },
+        {
+            "role": "user",
+            "content": "2",
+            "timestamp": "2026-06-01T23:54:05.857519"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay! Let’s do it. \n\nWhat would you like me to do next?",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:54:11.478943"
+        },
+        {
+            "role": "user",
+            "content": "3",
+            "timestamp": "2026-06-01T23:54:16.081670"
+        },
+        {
+            "role": "assistant",
+            "content": "Great! 3!  Here's something:\n\n**Tell me a short, silly joke.** 😄",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:54:23.090139"
+        },
+        {
+            "role": "user",
+            "content": "4",
+            "timestamp": "2026-06-01T23:54:28.125444"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, here’s a funny one:\n\nWhy did the bicycle fall over? \n\n… Because it was two tired! 😂\n\nWould you like another one?",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:54:45.716274"
+        },
+        {
+            "role": "user",
+            "content": "5",
+            "timestamp": "2026-06-01T23:54:49.554352"
+        },
+        {
+            "role": "assistant",
+            "content": "Five! Excellent!\n\nHere’s a riddle for you:\n\nI have cities, but no houses; forests, but no trees; and water, but no fish. What am I? \n\nLet me know if you'd like to try another one!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:54:52.376595"
+        },
+        {
+            "role": "user",
+            "content": "6",
+            "timestamp": "2026-06-01T23:55:02.609514"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, six! Ready for something fun? Here’s a word puzzle:\n\nWhat has an eye, but cannot see? 🔍\n\nLet me know if you want to play!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:04.121086"
+        },
+        {
+            "role": "user",
+            "content": "7",
+            "timestamp": "2026-06-01T23:55:08.336852"
+        },
+        {
+            "role": "assistant",
+            "content": "Seven! Let's continue!\n\nHere’s your next question:\n\nWhat is always in front of you but can't be seen? 🤔",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:09.289886"
+        },
+        {
+            "role": "user",
+            "content": "8",
+            "timestamp": "2026-06-01T23:55:16.289120"
+        },
+        {
+            "role": "assistant",
+            "content": "Eight! Ready for another challenge.\n\nHere’s your puzzle:\n\nI have no voice, yet I speak to all. I have no body, yet I travel the world. What am I? 🌍\n\nLet me know when you're ready!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:17.779688"
+        },
+        {
+            "role": "user",
+            "content": "9",
+            "timestamp": "2026-06-01T23:55:20.377346"
+        },
+        {
+            "role": "assistant",
+            "content": "Nine! Time for a little more fun.\n\nHere’s your question:\n\nWhat is always coming, but never arrives? ⏳\n\nLet me know if you want another one!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:21.506428"
+        },
+        {
+            "role": "user",
+            "content": "10",
+            "timestamp": "2026-06-01T23:55:23.654994"
+        },
+        {
+            "role": "assistant",
+            "content": "Ten! Let's keep the games going!\n\nHere’s your final puzzle:\n\nI am born of silence, yet I roar with sound.  I have no form, but shape the world around. What am I? 🌬️",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:25.268681"
+        },
+        {
+            "role": "user",
+            "content": "11",
+            "timestamp": "2026-06-01T23:55:52.070349"
+        },
+        {
+            "role": "assistant",
+            "content": "Eleven! Excellent! Let’s continue.\n\nHere's your next riddle:\n\nI have cities, but no houses; forests, but no trees; and water, but no fish. What am I? 🗺️💧",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T23:55:53.759353"
+        }
+    ]
+}

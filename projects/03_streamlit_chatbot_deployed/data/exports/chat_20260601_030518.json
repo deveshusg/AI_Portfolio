@@ -1,0 +1,19 @@
+{
+    "chat_id": "chat_20260601_030518",
+    "title": "Memory Test",
+    "model": "google/gemma-3-1b",
+    "created_at": "2026-06-01T03:05:18.727592",
+    "updated_at": "2026-06-01T03:05:18.736636",
+    "system_prompt": "\nYou are a helpful AI assistant.\n\nGuidelines:\n\n- Be accurate.\n- Be concise when possible.\n- Explain concepts clearly.\n- If you do not know something, say so.\n- Do not invent facts.\n",
+    "summary": "",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi there"
+        }
+    ]
+}
