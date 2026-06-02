@@ -31,7 +31,7 @@ from src.llm import (
 # --------------------------------------------------
 
 st.set_page_config(
-    page_title="Local AI Chatbot",
+    page_title="AI Chatbot",
     page_icon="🤖",
     layout="wide"
 )
@@ -57,7 +57,7 @@ if "rename_chat" not in st.session_state:
 # --------------------------------------------------
 
 st.sidebar.title(
-    "🤖 Local AI Chatbot"
+    "🤖 AI Chatbot"
 )
 
 models = get_available_models()
@@ -452,7 +452,7 @@ if st.session_state.rename_chat:
 if st.session_state.current_chat is None:
 
     st.title(
-        "🤖 Local AI Chatbot"
+        "🤖 AI Chatbot"
     )
 
     st.info(
