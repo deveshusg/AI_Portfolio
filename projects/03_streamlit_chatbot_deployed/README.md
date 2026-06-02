@@ -142,22 +142,39 @@ Selected Model
 03_streamlit_chatbot_deployed/
 
 ├── app.py
+
 ├── requirements.txt
+
 ├── README.md
+
 │
+
 ├── src/
+
 │   ├── config.py
+
 │   ├── llm.py
+
 │   ├── memory.py
+
 │   ├── feedback.py
+
 │   ├── model_manager.py
+
 │   └── prompts.py
+
 │
+
 ├── data/
+
 │   ├── conversations/
+
 │   └── exports/
+
 │
+
 └── .streamlit/
+
     └── secrets.toml
 
 
