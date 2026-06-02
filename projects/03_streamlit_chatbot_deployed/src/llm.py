@@ -197,6 +197,60 @@ def update_summary_if_needed(
     model_name,
 ):
 
+    messages = chat.get(
+        "messages",
+        []
+    )
+
+    current_count = len(messages)
+
+    last_summary_count = chat.get(
+        "last_summary_count",
+        0
+    )
+
+    if (
+        current_count
+        <
+        SUMMARY_TRIGGER_MESSAGES
+    ):
+        return chat
+
+    if (
+        current_count
+        <
+        last_summary_count
+        +
+        SUMMARY_TRIGGER_MESSAGES
+    ):
+        return chat
+
+    try:
+        print(
+        f"Generating summary at {current_count} messages"
+        )
+
+        summary = generate_summary(
+            messages=messages,
+            model_name=model_name,
+            previous_summary=chat.get(
+                "summary",
+                ""
+            )
+        )
+
+        chat["summary"] = summary
+
+        chat[
+            "last_summary_count"
+        ] = current_count
+
+    except Exception as e:
+
+        print(
+            f"Summary Error: {e}"
+        )
+
     return chat
 
 
