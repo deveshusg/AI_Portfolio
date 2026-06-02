@@ -112,15 +112,25 @@ Model availability and quotas are managed by Groq.
 
 
 User
+ 
  ↓
+
 Streamlit UI
+
  ↓
+
 app.py
+
  ↓
+
 llm.py
+
  ↓
+
 Groq API
+
  ↓
+
 Selected Model
 
 
