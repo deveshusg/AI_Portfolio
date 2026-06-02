@@ -44,3 +44,5 @@ tracked_projects.txt
 git_diagnostic.txt
 
 tracked_projects.txt
+
+**/secrets.toml

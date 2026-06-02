@@ -24,13 +24,13 @@ def get_secret(key, default=None):
         return default
 
 
-GEMINI_API_KEY = get_secret(
-    "GEMINI_API_KEY"
+GROQ_API_KEY = get_secret(
+    "GROQ_API_KEY"
 )
 
 DEFAULT_MODEL = get_secret(
-    "GEMINI_MODEL",
-    "gemini-2.5-flash"
+    "GROQ_MODEL",
+    "llama-3.3-70b-versatile"
 )
 
 TEMPERATURE = float(
@@ -63,9 +63,9 @@ SUMMARY_TRIGGER_MESSAGES = int(
 
 MODEL_INFO = {
     DEFAULT_MODEL: {
-        "parameters": "Gemini",
-        "family": "Google",
-        "type": "Cloud LLM",
-        "speed": "Fast"
+        "parameters": "70B",
+        "family": "Llama",
+        "type": "Groq Cloud",
+        "speed": "Very Fast"
     }
 }

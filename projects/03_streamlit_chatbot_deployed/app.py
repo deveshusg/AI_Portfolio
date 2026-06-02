@@ -1,5 +1,7 @@
 import streamlit as st
 from datetime import datetime
+from src.feedback import save_feedback
+import uuid
 
 from src.config import (
     MODEL_INFO,
@@ -269,6 +271,55 @@ if st.sidebar.button(
     st.rerun()
 
 # --------------------------------------------------
+# Feedback
+# --------------------------------------------------
+# Add Feedback Dialog
+if "chat_id" not in st.session_state:
+    st.session_state.chat_id = str(uuid.uuid4())[:8]
+@st.dialog("Feedback")
+def feedback_dialog():
+
+    name = st.text_input("Name")
+
+    email = st.text_input("Email")
+
+    feedback = st.text_area(
+        "Feedback",
+        height=150,
+    )
+
+    if st.button("Submit Feedback"):
+
+        if feedback.strip():
+
+            save_feedback(
+                name=name,
+                email=email,
+                feedback=feedback,
+                chat_id=st.session_state.chat_id,
+            )
+
+            st.success(
+                "Thank you for your feedback!"
+            )
+
+        else:
+            st.warning(
+                "Please enter feedback."
+            )    
+
+st.sidebar.divider()
+
+if st.sidebar.button(
+    "📝 Feedback"
+):
+    feedback_dialog()
+
+st.sidebar.caption(
+    "Help improve the chatbot"
+)
+
+# --------------------------------------------------
 # Existing Chats
 # --------------------------------------------------
 
@@ -305,6 +356,8 @@ if st.session_state.current_chat_id:
         +
         remaining_chats
     )
+
+
 
 # --------------------------------------------------
 # Chat Selection
@@ -346,6 +399,7 @@ for chat_info in all_chats:
         )
 
         st.rerun()
+    
 
     if is_selected:
 
@@ -353,6 +407,7 @@ for chat_info in all_chats:
             "Chat Actions",
             expanded=False
         ):
+            
 
             if st.button(
                 "✏ Rename",
@@ -369,13 +424,12 @@ for chat_info in all_chats:
                 delete_chat(
                     chat_info["chat_id"]
                 )
-
                 st.session_state.current_chat = None
 
                 st.session_state.current_chat_id = None
 
                 st.rerun()
-
+    
             if st.button(
                 "⬇ Export JSON",
                 key=f"json_{chat_info['chat_id']}"
@@ -401,6 +455,8 @@ for chat_info in all_chats:
                 st.toast(
                     "Markdown exported"
                 )
+
+
 
 # --------------------------------------------------
 # Rename Dialog
@@ -462,6 +518,7 @@ if st.session_state.current_chat is None:
     st.stop()
 
 chat = st.session_state.current_chat
+
 
 # --------------------------------------------------
 # Chat Header
@@ -738,6 +795,8 @@ with button_col2:
 # --------------------------------------------------
 
 st.divider()
+
+
 
 user_prompt = st.chat_input(
     "Type your message..."
