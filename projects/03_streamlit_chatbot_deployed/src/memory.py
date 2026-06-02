@@ -1,64 +1,202 @@
+# ==================================================
+# IMPORTS
+# ==================================================
+#
+# json
+# --------------------------------------------------
+# Stores conversations as JSON files.
+#
+# pathlib
+# --------------------------------------------------
+# Cross-platform file and folder handling.
+#
+# datetime
+# --------------------------------------------------
+# Creates timestamps for chats and messages.
+#
+# shutil
+# --------------------------------------------------
+# Used for exporting chat files.
+#
+# ==================================================
+
 import json
+
 from pathlib import Path
+
 from datetime import datetime
+
 import shutil
 
-from src.prompts import DEFAULT_SYSTEM_PROMPT
+from src.prompts import (
+    DEFAULT_SYSTEM_PROMPT
+)
 
-
+# ==================================================
+# PROJECT PATHS
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Paths
+# Centralized location for all project folders.
+#
+# Folder Structure
 # --------------------------------------------------
+#
+# project/
+#
+# ├── data/
+# │   ├── conversations/
+# │   └── exports/
+#
+# ==================================================
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = (
+    Path(__file__)
+    .resolve()
+    .parent
+    .parent
+)
 
-CONVERSATIONS_DIR = PROJECT_ROOT / "data" / "conversations"
-EXPORTS_DIR = PROJECT_ROOT / "data" / "exports"
+CONVERSATIONS_DIR = (
+    PROJECT_ROOT
+    / "data"
+    / "conversations"
+)
 
-CONVERSATIONS_DIR.mkdir(parents=True, exist_ok=True)
-EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+EXPORTS_DIR = (
+    PROJECT_ROOT
+    / "data"
+    / "exports"
+)
 
-
+# ==================================================
+# DIRECTORY CREATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Create Chat
+# Automatically creates folders if they do
+# not already exist.
+#
+# This allows first-time project startup
+# without manual setup.
+#
+# ==================================================
+
+CONVERSATIONS_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+EXPORTS_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+# ==================================================
+# CREATE CHAT
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-
-def create_chat(model_name):
-
-    timestamp = datetime.now()
-
-    chat_id = timestamp.strftime("chat_%Y%m%d_%H%M%S")
-
-    chat_data = {
-    "chat_id": chat_id,
-    "title": "New Chat",
-    "model": model_name,
-    "created_at": timestamp.isoformat(),
-    "updated_at": timestamp.isoformat(),
-    "system_prompt": DEFAULT_SYSTEM_PROMPT,
-    "summary": "",
-    "last_summary_count": 0,
-    "last_finish_reason": None,
-    "messages": []
-    }
-
-    return chat_data
-
-
+# Creates a brand-new conversation object.
+#
+# Stored Fields
 # --------------------------------------------------
-# Save Chat
-# --------------------------------------------------
+# chat_id
+# title
+# model
+# timestamps
+# summary
+# message history
+#
+# ==================================================
 
-def save_chat(chat_data):
+def create_chat(
+    model_name
+):
 
-    chat_file = (
-        CONVERSATIONS_DIR /
-        f"{chat_data['chat_id']}.json"
+    timestamp = (
+        datetime.now()
     )
 
-    chat_data["updated_at"] = datetime.now().isoformat()
+    chat_id = (
+        timestamp.strftime(
+            "chat_%Y%m%d_%H%M%S"
+        )
+    )
 
-    with open(chat_file, "w", encoding="utf-8") as file:
+    return {
+
+        "chat_id":
+        chat_id,
+
+        "title":
+        "New Chat",
+
+        "model":
+        model_name,
+
+        "created_at":
+        timestamp.isoformat(),
+
+        "updated_at":
+        timestamp.isoformat(),
+
+        "system_prompt":
+        DEFAULT_SYSTEM_PROMPT,
+
+        "summary":
+        "",
+
+        "last_summary_count":
+        0,
+
+        "last_finish_reason":
+        None,
+
+        "messages":
+        []
+    }
+
+# ==================================================
+# SAVE CHAT
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Writes a conversation to disk.
+#
+# Storage Format
+# --------------------------------------------------
+# JSON
+#
+# ==================================================
+
+def save_chat(
+    chat_data
+):
+
+    chat_file = (
+
+        CONVERSATIONS_DIR
+
+        /
+
+        f"{chat_data['chat_id']}.json"
+
+    )
+
+    chat_data[
+        "updated_at"
+    ] = datetime.now().isoformat()
+
+    with open(
+        chat_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
 
         json.dump(
             chat_data,
@@ -67,49 +205,103 @@ def save_chat(chat_data):
             ensure_ascii=False
         )
 
-
+# ==================================================
+# LOAD CHAT
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Load Chat
+# Reads a conversation from disk.
+#
+# Returns
 # --------------------------------------------------
+# dict
+# None
+#
+# ==================================================
 
-def load_chat(chat_id):
+def load_chat(
+    chat_id
+):
 
     chat_file = (
-        CONVERSATIONS_DIR /
+
+        CONVERSATIONS_DIR
+
+        /
+
         f"{chat_id}.json"
+
     )
 
     if not chat_file.exists():
 
         return None
 
-    with open(chat_file, "r", encoding="utf-8") as file:
+    with open(
+        chat_file,
+        "r",
+        encoding="utf-8"
+    ) as file:
 
-        return json.load(file)
+        return json.load(
+            file
+        )
 
-
+# ==================================================
+# LIST CHATS
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# List Chats
+# Returns metadata for every saved chat.
+#
+# Used By
 # --------------------------------------------------
+# Sidebar chat list.
+#
+# Sorted By
+# --------------------------------------------------
+# Most recently updated first.
+#
+# ==================================================
 
 def list_chats():
 
     chats = []
 
-    for file in CONVERSATIONS_DIR.glob("*.json"):
+    for file in (
+        CONVERSATIONS_DIR.glob(
+            "*.json"
+        )
+    ):
 
         try:
 
-            with open(file, "r", encoding="utf-8") as f:
+            with open(
+                file,
+                "r",
+                encoding="utf-8"
+            ) as handle:
 
-                chat = json.load(f)
+                chat = json.load(
+                    handle
+                )
 
                 chats.append(
                     {
-                        "chat_id": chat["chat_id"],
-                        "title": chat["title"],
-                        "model": chat["model"],
-                        "updated_at": chat["updated_at"]
+
+                        "chat_id":
+                        chat["chat_id"],
+
+                        "title":
+                        chat["title"],
+
+                        "model":
+                        chat["model"],
+
+                        "updated_at":
+                        chat["updated_at"]
                     }
                 )
 
@@ -118,41 +310,68 @@ def list_chats():
             continue
 
     chats.sort(
-        key=lambda x: x["updated_at"],
+        key=lambda item:
+        item["updated_at"],
         reverse=True
     )
 
     return chats
 
-
+# ==================================================
+# RENAME CHAT
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Rename Chat
-# --------------------------------------------------
+# Updates a chat title.
+#
+# ==================================================
 
-def rename_chat(chat_id, new_title):
+def rename_chat(
+    chat_id,
+    new_title
+):
 
-    chat = load_chat(chat_id)
+    chat = load_chat(
+        chat_id
+    )
 
     if chat is None:
 
         return False
 
-    chat["title"] = new_title
+    chat["title"] = (
+        new_title
+    )
 
-    save_chat(chat)
+    save_chat(
+        chat
+    )
 
     return True
 
-
+# ==================================================
+# DELETE CHAT
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Delete Chat
-# --------------------------------------------------
+# Permanently removes a conversation.
+#
+# ==================================================
 
-def delete_chat(chat_id):
+def delete_chat(
+    chat_id
+):
 
     chat_file = (
-        CONVERSATIONS_DIR /
+
+        CONVERSATIONS_DIR
+
+        /
+
         f"{chat_id}.json"
+
     )
 
     if chat_file.exists():
@@ -163,21 +382,39 @@ def delete_chat(chat_id):
 
     return False
 
-
+# ==================================================
+# EXPORT CHAT AS JSON
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Export JSON
-# --------------------------------------------------
+# Copies the original conversation file into
+# the exports folder.
+#
+# ==================================================
 
-def export_chat_json(chat_id):
+def export_chat_json(
+    chat_id
+):
 
     source_file = (
-        CONVERSATIONS_DIR /
+
+        CONVERSATIONS_DIR
+
+        /
+
         f"{chat_id}.json"
+
     )
 
     export_file = (
-        EXPORTS_DIR /
+
+        EXPORTS_DIR
+
+        /
+
         f"{chat_id}.json"
+
     )
 
     if not source_file.exists():
@@ -191,22 +428,44 @@ def export_chat_json(chat_id):
 
     return True
 
-
+# ==================================================
+# EXPORT CHAT AS MARKDOWN
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Export Markdown
+# Creates a human-readable Markdown version
+# of the conversation.
+#
+# Useful For
 # --------------------------------------------------
+# Documentation
+# Notes
+# Research
+# Knowledge Base Creation
+#
+# ==================================================
 
-def export_chat_markdown(chat_id):
+def export_chat_markdown(
+    chat_id
+):
 
-    chat = load_chat(chat_id)
+    chat = load_chat(
+        chat_id
+    )
 
     if chat is None:
 
         return False
 
     markdown_file = (
-        EXPORTS_DIR /
+
+        EXPORTS_DIR
+
+        /
+
         f"{chat_id}.md"
+
     )
 
     with open(
@@ -227,13 +486,20 @@ def export_chat_markdown(chat_id):
             f"Created: {chat['created_at']}\n\n"
         )
 
-        file.write("---\n\n")
+        file.write(
+            "---\n\n"
+        )
 
         for message in chat["messages"]:
 
-            role = message["role"].title()
+            role = (
+                message["role"]
+                .title()
+            )
 
-            content = message["content"]
+            content = (
+                message["content"]
+            )
 
             file.write(
                 f"## {role}\n\n"

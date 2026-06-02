@@ -1,7 +1,45 @@
-import streamlit as st
+# ==================================================
+# IMPORTS
+# ==================================================
+#
+# Standard Library
+# --------------------------------------------------
+# datetime
+#     Used for timestamps on messages.
+#
+# uuid
+#     Used to generate anonymous chat IDs for
+#     feedback submissions.
+#
+# ==================================================
+
 from datetime import datetime
-from src.feedback import save_feedback
 import uuid
+
+# ==================================================
+# THIRD PARTY LIBRARIES
+# ==================================================
+#
+# streamlit
+#     Main UI framework.
+#
+# ==================================================
+
+import streamlit as st
+
+# ==================================================
+# PROJECT MODULES
+# ==================================================
+#
+# Configuration
+# Memory Management
+# LLM Operations
+# Feedback Storage
+# Model Management
+#
+# ==================================================
+
+from src.feedback import save_feedback
 
 from src.config import (
     MODEL_INFO,
@@ -28,9 +66,27 @@ from src.llm import (
     generate_summary
 )
 
+from src.model_manager import (
+    initialize_model_state,
+    get_sorted_models,
+    clean_model_name,
+)
+
+# ==================================================
+# PAGE CONFIGURATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Page Config
-# --------------------------------------------------
+# Controls:
+#
+# - Browser tab title
+# - Browser tab icon
+# - Layout width
+#
+# wide layout gives more space for long chats.
+#
+# ==================================================
 
 st.set_page_config(
     page_title="AI Chatbot",
@@ -38,64 +94,167 @@ st.set_page_config(
     layout="wide"
 )
 
-# --------------------------------------------------
-# Session State
-# --------------------------------------------------
+# ==================================================
+# SESSION STATE INITIALIZATION
+# ==================================================
+#
+# Streamlit reruns the script frequently.
+#
+# Session State is used to preserve:
+#
+# - Current chat
+# - Current chat id
+# - Selected model
+# - Rename dialog state
+#
+# ==================================================
 
 if "current_chat" not in st.session_state:
+
     st.session_state.current_chat = None
 
 if "current_chat_id" not in st.session_state:
+
     st.session_state.current_chat_id = None
 
 if "selected_model" not in st.session_state:
+
     st.session_state.selected_model = None
 
 if "rename_chat" not in st.session_state:
+
     st.session_state.rename_chat = False
 
+if "chat_id" not in st.session_state:
+
+    st.session_state.chat_id = (
+        str(uuid.uuid4())[:8]
+    )
+
+# ==================================================
+# SIDEBAR
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Sidebar
-# --------------------------------------------------
+# Contains:
+#
+# - Model selection
+# - Model details
+# - Conversation statistics
+# - Feedback button
+# - Chat list
+#
+# ==================================================
 
 st.sidebar.title(
     "🤖 AI Chatbot"
 )
 
-models = get_available_models()
+# ==================================================
+# MODEL STATE INITIALIZATION
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Prepares model-related session variables.
+#
+# Current use:
+#
+# - Exhausted model tracking
+# - Future model management features
+#
+# ==================================================
+
+initialize_model_state(
+    st.session_state
+)
+
+# ==================================================
+# AVAILABLE MODELS
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Get models prepared for display.
+#
+# ==================================================
+
+models = get_sorted_models(
+    st.session_state
+)
 
 if not models:
 
     st.error(
-        "Could not connect to LM Studio."
+        "No models available."
     )
 
     st.stop()
 
+# ==================================================
+# MODEL SELECTION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Model Selection Safety
+# Maintains selected model across reruns.
+#
+# Process
 # --------------------------------------------------
+# 1. Get currently selected model.
+# 2. Clean display formatting.
+# 3. Build dropdown.
+# 4. Save selection.
+#
+# ==================================================
 
-if st.session_state.selected_model is None:
+current_model = (
+    clean_model_name(
+        st.session_state.get(
+            "selected_model"
+        )
+    )
+)
 
-    st.session_state.selected_model = (
-        models[0]
+if current_model is None:
+
+    current_model = (
+        clean_model_name(
+            models[0]
+        )
     )
 
-if (
-    st.session_state.selected_model
-    not in models
-):
+model_lookup = {
 
-    st.session_state.selected_model = (
-        models[0]
+    clean_model_name(model): index
+
+    for index, model
+
+    in enumerate(models)
+}
+
+if current_model not in model_lookup:
+
+    current_model = (
+        clean_model_name(
+            models[0]
+        )
     )
 
-selected_model = st.sidebar.selectbox(
-    "Model",
-    models,
-    index=models.index(
-        st.session_state.selected_model
+selected_model_display = (
+    st.sidebar.selectbox(
+        "Model",
+        models,
+        index=model_lookup[
+            current_model
+        ]
+    )
+)
+
+selected_model = (
+    clean_model_name(
+        selected_model_display
     )
 )
 
@@ -103,9 +262,18 @@ st.session_state.selected_model = (
     selected_model
 )
 
+# ==================================================
+# MODEL DETAILS
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Model Details
-# --------------------------------------------------
+# Displays metadata about the currently
+# selected model.
+#
+# Information comes from MODEL_INFO.
+#
+# ==================================================
 
 model_info = MODEL_INFO.get(
     selected_model,
@@ -133,9 +301,23 @@ with st.sidebar.expander(
         f"Speed: {model_info.get('speed', 'Unknown')}"
     )
 
+# ==================================================
+# CONVERSATION STATISTICS
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Conversation Stats
-# --------------------------------------------------
+# Displays useful information about the
+# currently loaded conversation.
+#
+# Includes:
+#
+# - Message counts
+# - Summary status
+# - Last model used
+# - Summary controls
+#
+# ==================================================
 
 with st.sidebar.expander(
     "Conversation Stats",
@@ -157,14 +339,16 @@ with st.sidebar.expander(
 
         user_messages = sum(
             1
-            for m in current_chat["messages"]
-            if m["role"] == "user"
+            for message
+            in current_chat["messages"]
+            if message["role"] == "user"
         )
 
         assistant_messages = sum(
             1
-            for m in current_chat["messages"]
-            if m["role"] == "assistant"
+            for message
+            in current_chat["messages"]
+            if message["role"] == "assistant"
         )
 
         st.write(
@@ -240,15 +424,28 @@ with st.sidebar.expander(
 
                 st.rerun()
 
-            except Exception as e:
+            except Exception as error:
 
                 st.error(
-                    f"Summary failed: {e}"
+                    f"Summary failed: {error}"
                 )
 
+# ==================================================
+# NEW CHAT CREATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# New Chat
+# Creates a completely new conversation.
+#
+# Process
 # --------------------------------------------------
+# 1. Create empty chat object.
+# 2. Save chat.
+# 3. Make it active.
+# 4. Refresh UI.
+#
+# ==================================================
 
 if st.sidebar.button(
     "+ New Chat"
@@ -266,38 +463,76 @@ if st.sidebar.button(
         chat["chat_id"]
     )
 
-    save_chat(chat)
+    save_chat(
+        chat
+    )
 
     st.rerun()
 
+# ==================================================
+# FEEDBACK DIALOG
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Feedback
+# Allows users to submit feedback.
+#
+# Information Stored
 # --------------------------------------------------
-# Add Feedback Dialog
-if "chat_id" not in st.session_state:
-    st.session_state.chat_id = str(uuid.uuid4())[:8]
-@st.dialog("Feedback")
+# - Name
+# - Email
+# - Feedback
+# - Session Chat ID
+# - Recent Chat History
+#
+# Chat History
+# --------------------------------------------------
+# Only the most recent 20 messages are stored.
+#
+# This keeps feedback records small while still
+# providing enough context for debugging and
+# improvement analysis.
+#
+# ==================================================
+
+@st.dialog(
+    "Feedback"
+)
 def feedback_dialog():
 
-    name = st.text_input("Name")
+    name = st.text_input(
+        "Name"
+    )
 
-    email = st.text_input("Email")
+    email = st.text_input(
+        "Email"
+    )
 
     feedback = st.text_area(
         "Feedback",
         height=150,
     )
 
-    if st.button("Submit Feedback"):
+    if st.button(
+        "Submit Feedback"
+    ):
 
         if feedback.strip():
+
             chat_log = "\n\n".join(
                 [
-                    f"{m['role'].upper()}: {m['content']}"
-                    for m in st.session_state.current_chat.get(
-                        "messages",
-                        []
-                    )[-20:]
+                    (
+                        f"{message['role'].upper()}: "
+                        f"{message['content']}"
+                    )
+                    for message in (
+                        st.session_state
+                        .current_chat
+                        .get(
+                            "messages",
+                            []
+                        )[-20:]
+                    )
                 ]
             )
 
@@ -305,7 +540,9 @@ def feedback_dialog():
                 name=name,
                 email=email,
                 feedback=feedback,
-                chat_id=st.session_state.chat_id,
+                chat_id=(
+                    st.session_state.chat_id
+                ),
                 chat_log=chat_log
             )
 
@@ -314,24 +551,47 @@ def feedback_dialog():
             )
 
         else:
+
             st.warning(
                 "Please enter feedback."
-            )    
+            )
+
+# ==================================================
+# FEEDBACK BUTTON
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Makes feedback accessible without scrolling
+# through chat history.
+#
+# ==================================================
 
 st.sidebar.divider()
 
 if st.sidebar.button(
     "📝 Feedback"
 ):
+
     feedback_dialog()
 
 st.sidebar.caption(
     "Help improve the chatbot"
 )
 
+# ==================================================
+# CHAT LIST SECTION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Existing Chats
+# Displays all saved chats.
+#
+# Behavior
 # --------------------------------------------------
+# Active chat is displayed first.
+#
+# ==================================================
 
 st.sidebar.divider()
 
@@ -341,25 +601,39 @@ st.sidebar.subheader(
 
 all_chats = list_chats()
 
+# ==================================================
+# MOVE ACTIVE CHAT TO TOP
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Makes navigation easier when many chats exist.
+#
+# ==================================================
+
 if st.session_state.current_chat_id:
 
     selected_chat = []
 
     remaining_chats = []
 
-    for c in all_chats:
+    for chat_info in all_chats:
 
         if (
-            c["chat_id"]
+            chat_info["chat_id"]
             ==
             st.session_state.current_chat_id
         ):
 
-            selected_chat.append(c)
+            selected_chat.append(
+                chat_info
+            )
 
         else:
 
-            remaining_chats.append(c)
+            remaining_chats.append(
+                chat_info
+            )
 
     all_chats = (
         selected_chat
@@ -367,11 +641,19 @@ if st.session_state.current_chat_id:
         remaining_chats
     )
 
-
-
+# ==================================================
+# CHAT SELECTION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Chat Selection
+# Loads an existing chat into memory.
+#
+# Visual Indicator
 # --------------------------------------------------
+# ▶ indicates currently selected chat.
+#
+# ==================================================
 
 for chat_info in all_chats:
 
@@ -385,11 +667,15 @@ for chat_info in all_chats:
 
     )
 
-    label = chat_info["title"]
+    label = (
+        chat_info["title"]
+    )
 
     if is_selected:
 
-        label = f"▶ {label}"
+        label = (
+            f"▶ {label}"
+        )
 
     if st.sidebar.button(
         label,
@@ -409,7 +695,26 @@ for chat_info in all_chats:
         )
 
         st.rerun()
-    
+
+# ==================================================
+# CHAT ACTIONS
+# ==================================================
+#
+# Purpose
+# --------------------------------------------------
+# Provides actions for the currently
+# selected chat.
+#
+# Available Actions
+# --------------------------------------------------
+# - Rename
+# - Delete
+# - Export JSON
+# - Export Markdown
+#
+# Only visible for the active chat.
+#
+# ==================================================
 
     if is_selected:
 
@@ -417,14 +722,15 @@ for chat_info in all_chats:
             "Chat Actions",
             expanded=False
         ):
-            
 
             if st.button(
                 "✏ Rename",
                 key=f"rename_{chat_info['chat_id']}"
             ):
 
-                st.session_state.rename_chat = True
+                st.session_state.rename_chat = (
+                    True
+                )
 
             if st.button(
                 "🗑 Delete",
@@ -434,12 +740,17 @@ for chat_info in all_chats:
                 delete_chat(
                     chat_info["chat_id"]
                 )
-                st.session_state.current_chat = None
 
-                st.session_state.current_chat_id = None
+                st.session_state.current_chat = (
+                    None
+                )
+
+                st.session_state.current_chat_id = (
+                    None
+                )
 
                 st.rerun()
-    
+
             if st.button(
                 "⬇ Export JSON",
                 key=f"json_{chat_info['chat_id']}"
@@ -466,18 +777,31 @@ for chat_info in all_chats:
                     "Markdown exported"
                 )
 
-
-
+# ==================================================
+# RENAME CHAT DIALOG
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Rename Dialog
+# Allows users to rename the active chat.
+#
+# Process
 # --------------------------------------------------
+# 1. Enter new name.
+# 2. Save to storage.
+# 3. Update session state.
+# 4. Refresh UI.
+#
+# ==================================================
 
 @st.dialog(
     "Rename Chat"
 )
 def rename_chat_dialog():
 
-    chat = st.session_state.current_chat
+    chat = (
+        st.session_state.current_chat
+    )
 
     new_name = st.text_input(
         "New Chat Name",
@@ -511,9 +835,20 @@ if st.session_state.rename_chat:
 
     rename_chat_dialog()
 
+# ==================================================
+# MAIN WINDOW INITIALIZATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Main Window
-# --------------------------------------------------
+# A chat must be selected before the main
+# interface can be shown.
+#
+# If no chat exists:
+# - Show guidance message.
+# - Stop execution.
+#
+# ==================================================
 
 if st.session_state.current_chat is None:
 
@@ -527,20 +862,43 @@ if st.session_state.current_chat is None:
 
     st.stop()
 
-chat = st.session_state.current_chat
+chat = (
+    st.session_state.current_chat
+)
 
-
+# ==================================================
+# CHAT HEADER
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Chat Header
-# --------------------------------------------------
+# Display current conversation title.
+#
+# ==================================================
 
 st.title(
     chat["title"]
 )
 
+# ==================================================
+# MESSAGE HISTORY
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Display Messages
+# Render every stored message.
+#
+# Message Types
 # --------------------------------------------------
+# user
+# assistant
+#
+# Additional Information
+# --------------------------------------------------
+# Assistant messages display the model that
+# generated the response.
+#
+# ==================================================
 
 for message in chat["messages"]:
 
@@ -549,13 +907,9 @@ for message in chat["messages"]:
     ):
 
         if (
-
             message["role"]
-
             ==
-
             "assistant"
-
         ):
 
             if (
@@ -564,36 +918,68 @@ for message in chat["messages"]:
             ):
 
                 st.caption(
-                    f"Assistant • {message['model']}"
+                    (
+                        "Assistant • "
+                        f"{message['model']}"
+                    )
                 )
 
         st.markdown(
             message["content"]
         )
 
+# ==================================================
+# CONVERSATION INFORMATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Conversation Info
-# --------------------------------------------------
+# Shows:
+#
+# - Last model used
+# - Next model selected
+#
+# Useful when users frequently switch
+# between models.
+#
+# ==================================================
 
 st.divider()
 
-col1, col2 = st.columns(2)
+info_col_1, info_col_2 = (
+    st.columns(2)
+)
 
-with col1:
-
-    st.caption(
-        f"Last answer came from: {chat['model']}"
-    )
-
-with col2:
+with info_col_1:
 
     st.caption(
-        f"Next answer will come from: {selected_model}"
+        (
+            "Last answer came from: "
+            f"{chat['model']}"
+        )
     )
 
+with info_col_2:
+
+    st.caption(
+        (
+            "Next answer will come from: "
+            f"{selected_model}"
+        )
+    )
+
+# ==================================================
+# RESPONSE ACTIONS
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Action Buttons
-# --------------------------------------------------
+# Provides controls for:
+#
+# - Regeneration
+# - Continuation
+#
+# ==================================================
 
 last_message_is_assistant = (
 
@@ -609,20 +995,34 @@ last_message_is_assistant = (
 
 )
 
-button_col1, button_col2 = st.columns(2)
+action_col_1, action_col_2 = (
+    st.columns(2)
+)
 
+# ==================================================
+# REGENERATE RESPONSE
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Regenerate Response
-# --------------------------------------------------
+# Removes the most recent assistant response.
+#
+# Sends the same conversation context back
+# to the selected model.
+#
+# Generates a fresh answer.
+#
+# ==================================================
 
-with button_col1:
+with action_col_1:
 
-    if (
-        last_message_is_assistant
-    ):
+    if last_message_is_assistant:
 
         if st.button(
-            f"🔄 Regenerate Using {selected_model}",
+            (
+                "🔄 Regenerate Using "
+                f"{selected_model}"
+            ),
             use_container_width=True
         ):
 
@@ -649,7 +1049,8 @@ with button_col1:
 
                     if (
                         event["type"]
-                        == "token"
+                        ==
+                        "token"
                     ):
 
                         regenerated_response += (
@@ -658,7 +1059,8 @@ with button_col1:
 
                     elif (
                         event["type"]
-                        == "finish"
+                        ==
+                        "finish"
                     ):
 
                         finish_reason = (
@@ -667,13 +1069,18 @@ with button_col1:
 
             chat["messages"].append(
                 {
-                    "role": "assistant",
+                    "role":
+                    "assistant",
+
                     "content":
                     regenerated_response,
+
                     "model":
                     selected_model,
+
                     "timestamp":
-                    datetime.now().isoformat()
+                    datetime.now()
+                    .isoformat()
                 }
             )
 
@@ -685,9 +1092,11 @@ with button_col1:
                 selected_model
             )
 
-            chat = update_summary_if_needed(
-                chat,
-                selected_model
+            chat = (
+                update_summary_if_needed(
+                    chat,
+                    selected_model
+                )
             )
 
             save_chat(
@@ -700,16 +1109,28 @@ with button_col1:
 
             st.rerun()
 
+# ==================================================
+# CONTINUE GENERATION
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Continue Generating
-# --------------------------------------------------
+# Used when a model stops because it reaches
+# its output length limit.
+#
+# Continues generation from the current
+# conversation state.
+#
+# ==================================================
 
-with button_col2:
+with action_col_2:
 
     if (
         chat.get(
             "last_finish_reason"
-        ) == "length"
+        )
+        ==
+        "length"
     ):
 
         if st.button(
@@ -717,20 +1138,29 @@ with button_col2:
             use_container_width=True
         ):
 
-            last_assistant_index = None
+            last_assistant_index = (
+                None
+            )
 
-            for i in range(
+            for index in range(
+
                 len(chat["messages"]) - 1,
+
                 -1,
+
                 -1
+
             ):
 
                 if (
-                    chat["messages"][i]["role"]
-                    == "assistant"
+                    chat["messages"][index]["role"]
+                    ==
+                    "assistant"
                 ):
 
-                    last_assistant_index = i
+                    last_assistant_index = (
+                        index
+                    )
 
                     break
 
@@ -754,7 +1184,8 @@ with button_col2:
 
                         if (
                             event["type"]
-                            == "token"
+                            ==
+                            "token"
                         ):
 
                             extra_text += (
@@ -763,7 +1194,8 @@ with button_col2:
 
                         elif (
                             event["type"]
-                            == "finish"
+                            ==
+                            "finish"
                         ):
 
                             finish_reason = (
@@ -773,8 +1205,13 @@ with button_col2:
                     chat["messages"][
                         last_assistant_index
                     ]["content"] += (
+
                         "\n\n"
-                        + extra_text
+
+                        +
+
+                        extra_text
+
                     )
 
                     chat[
@@ -785,9 +1222,11 @@ with button_col2:
                         selected_model
                     )
 
-                    chat = update_summary_if_needed(
-                        chat,
-                        selected_model
+                    chat = (
+                        update_summary_if_needed(
+                            chat,
+                            selected_model
+                        )
                     )
 
                     save_chat(
@@ -800,19 +1239,47 @@ with button_col2:
 
                     st.rerun()
 
+# ==================================================
+# INPUT AREA
+# ==================================================
+#
+# Purpose
 # --------------------------------------------------
-# Input Area
-# --------------------------------------------------
+# Provides the chat input box used to submit
+# prompts to the selected model.
+#
+# ==================================================
 
 st.divider()
-
-
 
 user_prompt = st.chat_input(
     "Type your message..."
 )
 
+# ==================================================
+# USER PROMPT RECEIVED
+# ==================================================
+
 if user_prompt:
+
+    # ==============================================
+    # AUTO CHAT TITLE GENERATION
+    # ==============================================
+    #
+    # Purpose
+    # ----------------------------------------------
+    # Uses the first user message to generate a
+    # meaningful chat title.
+    #
+    # Example
+    # ----------------------------------------------
+    # User:
+    # "Explain IFRS 9 staging methodology"
+    #
+    # Title:
+    # "Explain IFRS 9 staging..."
+    #
+    # ==============================================
 
     if (
         chat["title"]
@@ -826,17 +1293,19 @@ if user_prompt:
             .split()
         )
 
-        chat["title"] = " ".join(
-            words[:6]
+        chat["title"] = (
+            " ".join(
+                words[:6]
+            )
         )
 
         if len(words) > 6:
 
             chat["title"] += "..."
 
-    # --------------------------------------------------
-    # Prevent Duplicate User Messages
-    # --------------------------------------------------
+    # ==============================================
+    # PREVENT DUPLICATE USER MESSAGES
+    # ==============================================
 
     if (
 
@@ -856,17 +1325,21 @@ if user_prompt:
 
         chat["messages"].append(
             {
-                "role": "user",
+                "role":
+                "user",
+
                 "content":
                 user_prompt,
+
                 "timestamp":
-                datetime.now().isoformat()
+                datetime.now()
+                .isoformat()
             }
         )
 
-    # --------------------------------------------------
-    # Display User Message
-    # --------------------------------------------------
+    # ==============================================
+    # DISPLAY USER MESSAGE
+    # ==============================================
 
     with st.chat_message(
         "user"
@@ -876,9 +1349,9 @@ if user_prompt:
             user_prompt
         )
 
-    # --------------------------------------------------
-    # Generate Assistant Response
-    # --------------------------------------------------
+    # ==============================================
+    # ASSISTANT RESPONSE GENERATION
+    # ==============================================
 
     with st.chat_message(
         "assistant"
@@ -890,22 +1363,29 @@ if user_prompt:
 
         full_response = ""
 
+        finish_reason = None
+
+        response_failed = False
+
         messages_for_llm = (
             build_context_for_llm(
                 chat
             )
         )
 
-        finish_reason = None
-
         for event in stream_llm(
             messages_for_llm,
             selected_model
         ):
 
+            # --------------------------------------
+            # Streaming Tokens
+            # --------------------------------------
+
             if (
                 event["type"]
-                == "token"
+                ==
+                "token"
             ):
 
                 full_response += (
@@ -916,58 +1396,164 @@ if user_prompt:
                     full_response
                 )
 
+            # --------------------------------------
+            # Generation Finished
+            # --------------------------------------
+
             elif (
                 event["type"]
-                == "finish"
+                ==
+                "finish"
             ):
 
                 finish_reason = (
                     event["reason"]
                 )
 
-    # --------------------------------------------------
-    # Save Assistant Message
-    # --------------------------------------------------
+            # --------------------------------------
+            # Model Error Handling
+            # --------------------------------------
 
-    chat["messages"].append(
-        {
-            "role": "assistant",
-            "content":
-            full_response,
-            "model":
-            selected_model,
-            "timestamp":
-            datetime.now().isoformat()
-        }
-    )
+            elif (
+                event["type"]
+                ==
+                "model_error"
+            ):
 
-    chat[
-        "last_finish_reason"
-    ] = finish_reason
+                response_failed = True
 
-    chat["model"] = (
-        selected_model
-    )
+                friendly = (
+                    event.get(
+                        "friendly",
+                        {}
+                    )
+                )
 
-    # --------------------------------------------------
-    # Automatic Memory Summarization
-    # --------------------------------------------------
+                title = (
+                    friendly.get(
+                        "title",
+                        "Model Error"
+                    )
+                )
 
-    chat = update_summary_if_needed(
-        chat,
-        selected_model
-    )
+                message = (
+                    friendly.get(
+                        "message",
+                        "An unexpected error occurred."
+                    )
+                )
 
-    # --------------------------------------------------
-    # Persist Chat
-    # --------------------------------------------------
+                suggestion = (
+                    friendly.get(
+                        "suggestion",
+                        "Please try again."
+                    )
+                )
 
-    save_chat(
-        chat
-    )
+                response_container.empty()
 
-    st.session_state.current_chat = (
-        chat
-    )
+                st.error(
+                    f"⚠ {title}"
+                )
+
+                st.markdown(
+                    f"""
+**What happened?**
+
+{message}
+
+**What can I do?**
+
+{suggestion}
+"""
+                )
+
+                with st.expander(
+                    "Technical Details"
+                ):
+
+                    st.code(
+                        event["error"]
+                    )
+
+                    st.caption(
+                        "Copy the text above when reporting issues."
+                    )
+
+                break
+
+    # ==============================================
+    # SAVE ASSISTANT MESSAGE
+    # ==============================================
+    #
+    # Purpose
+    # ----------------------------------------------
+    # Save only successful responses.
+    #
+    # Prevents:
+    # - Empty messages
+    # - Error messages
+    # - Failed generations
+    #
+    # ==============================================
+
+    if (
+
+        not response_failed
+
+        and
+
+        full_response.strip()
+
+    ):
+
+        chat["messages"].append(
+            {
+                "role":
+                "assistant",
+
+                "content":
+                full_response,
+
+                "model":
+                selected_model,
+
+                "timestamp":
+                datetime.now()
+                .isoformat()
+            }
+        )
+
+        chat[
+            "last_finish_reason"
+        ] = finish_reason
+
+        chat["model"] = (
+            selected_model
+        )
+
+        # ==========================================
+        # MEMORY SUMMARY UPDATE
+        # ==========================================
+
+        chat = (
+            update_summary_if_needed(
+                chat,
+                selected_model
+            )
+        )
+
+        # ==========================================
+        # SAVE CHAT
+        # ==========================================
+
+        save_chat(
+            chat
+        )
+
+        st.session_state.current_chat = (
+            chat
+        )
 
     st.rerun()
+
