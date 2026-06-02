@@ -261,6 +261,7 @@ For long-term persistence in production environments, an external database or st
 
 
 git clone https://github.com/deveshusg/AI_Portfolio.git
+
 cd AI_Portfolio/projects/03_streamlit_chatbot_deployed
 
 
@@ -296,9 +297,13 @@ Create a `.env` file:
 
 
 GROQ_API_KEY=your_api_key
+
 TEMPERATURE=0.7
+
 MAX_TOKENS=1000
+
 MAX_HISTORY_MESSAGES=10
+
 SUMMARY_TRIGGER_MESSAGES=20
 
 
@@ -355,6 +360,3 @@ Potential Future Enhancements:
 
 ---
 
-## License
-
-This project is part of the AI Portfolio repository and is intended for learning, experimentation, and portfolio demonstration purposes.
