@@ -1,0 +1,123 @@
+{
+    "chat_id": "chat_20260601_190817",
+    "title": "lets start fibonachi series. I will...",
+    "model": "google/gemma-3-1b",
+    "created_at": "2026-06-01T19:08:17.197927",
+    "updated_at": "2026-06-01T19:11:26.219364",
+    "system_prompt": "\nYou are a helpful AI assistant.\n\nGuidelines:\n\n- Be accurate.\n- Be concise when possible.\n- Explain concepts clearly.\n- If you do not know something, say so.\n- Do not invent facts.\n",
+    "summary": "",
+    "last_summary_count": 20,
+    "last_finish_reason": "stop",
+    "messages": [
+        {
+            "role": "user",
+            "content": "lets start fibonachi series. I will give you 1st  number 1 then you start",
+            "timestamp": "2026-06-01T19:08:57.197964"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, let's do it!\n\nMy first number is 1.\n",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:08:59.445442"
+        },
+        {
+            "role": "user",
+            "content": "2",
+            "timestamp": "2026-06-01T19:09:04.153268"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, my next number is 2.\n\n3\n",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:09:04.666692"
+        },
+        {
+            "role": "user",
+            "content": "5",
+            "timestamp": "2026-06-01T19:09:07.794658"
+        },
+        {
+            "role": "assistant",
+            "content": "4\n",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:09:07.933808"
+        },
+        {
+            "role": "user",
+            "content": "9",
+            "timestamp": "2026-06-01T19:09:22.598362"
+        },
+        {
+            "role": "assistant",
+            "content": "7\n",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:09:22.972510"
+        },
+        {
+            "role": "user",
+            "content": "16",
+            "timestamp": "2026-06-01T19:09:30.825898"
+        },
+        {
+            "role": "assistant",
+            "content": "8\n",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:09:30.967951"
+        },
+        {
+            "role": "user",
+            "content": "do you even know fibonachi series?",
+            "timestamp": "2026-06-01T19:09:51.067532"
+        },
+        {
+            "role": "assistant",
+            "content": "You’re right to question that! My apologies. I seem to have gotten stuck on a pattern and haven't really grasped the Fibonacci sequence yet. \n\nLet's start again! My first number is 10. What's your next number?",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:09:52.840325"
+        },
+        {
+            "role": "user",
+            "content": "what is Fibonacci sequence",
+            "timestamp": "2026-06-01T19:10:17.331817"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, let’s talk about the Fibonacci Sequence!\n\nThe Fibonacci Sequence is a series of numbers where each number is the sum of the two preceding numbers. It starts with:\n\n*   0\n*   1\n\nand then it continues like this:\n\n1.  0, 1\n2.  1, 1\n3.  2, 1\n4.  3, 2\n5.  5, 3\n6.  8, ",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:10:20.284785"
+        },
+        {
+            "role": "user",
+            "content": "so now you know it. 1st number = 0: your turn",
+            "timestamp": "2026-06-01T19:10:46.902792"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay! My first number is 0.\n\nNext number: 1\n\nLet’s continue!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:10:47.860669"
+        },
+        {
+            "role": "user",
+            "content": "1",
+            "timestamp": "2026-06-01T19:10:52.151162"
+        },
+        {
+            "role": "assistant",
+            "content": "2\n\n3\n\n5\n\n8\n\n13\n\n21\n\n… and so on! Let's keep it going...\n\n47  (Fibonacci sequence continues!)\n\nWhat's your next number?",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:10:53.352853"
+        },
+        {
+            "role": "user",
+            "content": "one number at a time so I will only consider your 2. so my number is 3",
+            "timestamp": "2026-06-01T19:11:24.218918"
+        },
+        {
+            "role": "assistant",
+            "content": "Okay, great! My next number is 5.\n\nAnd now the sequence continues:\n\n8, 13, 21, 34, 55… and so on!",
+            "model": "google/gemma-3-1b",
+            "timestamp": "2026-06-01T19:11:25.715783"
+        }
+    ]
+}

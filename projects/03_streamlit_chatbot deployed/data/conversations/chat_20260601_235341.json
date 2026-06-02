@@ -1,0 +1,12 @@
+{
+    "chat_id": "chat_20260601_235341",
+    "title": "New Chat",
+    "model": "deepseek-r1-distill-qwen-14b",
+    "created_at": "2026-06-01T23:53:41.030126",
+    "updated_at": "2026-06-01T23:53:41.030126",
+    "system_prompt": "\nYou are a helpful AI assistant.\n\nGuidelines:\n\n- Be accurate.\n- Be concise when possible.\n- Explain concepts clearly.\n- If you do not know something, say so.\n- Do not invent facts.\n",
+    "summary": "",
+    "last_summary_count": 0,
+    "last_finish_reason": null,
+    "messages": []
+}
