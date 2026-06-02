@@ -34,6 +34,7 @@ def save_feedback(
     email,
     feedback,
     chat_id,
+    chat_log,
 ):
 
     sheet = get_sheet()
@@ -49,5 +50,6 @@ def save_feedback(
             email,
             feedback,
             chat_id,
+            chat_log,
         ]
     )

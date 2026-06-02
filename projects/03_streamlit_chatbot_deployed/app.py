@@ -291,12 +291,22 @@ def feedback_dialog():
     if st.button("Submit Feedback"):
 
         if feedback.strip():
+            chat_log = "\n\n".join(
+                [
+                    f"{m['role'].upper()}: {m['content']}"
+                    for m in st.session_state.current_chat.get(
+                        "messages",
+                        []
+                    )[-20:]
+                ]
+            )
 
             save_feedback(
                 name=name,
                 email=email,
                 feedback=feedback,
                 chat_id=st.session_state.chat_id,
+                chat_log=chat_log
             )
 
             st.success(
